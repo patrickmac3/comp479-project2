@@ -17,8 +17,8 @@ class Index:
         # counter to generate the unique document id 
         self.counter = 0
         # file path to save index and mapper 
-        self.index_path = "index/index.json"
-        self.mapper_path = "index/mapper.json"   
+        self.index_path = "index_main/index.json"
+        self.mapper_path = "index_main/mapper.json"   
         # Quick way of getting id for url since it is beeing passed page by page 
         self.previous_id = None
         self.previous_url = None
