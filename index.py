@@ -1,12 +1,14 @@
 from collections import defaultdict
 import nltk 
 import json
+import string 
 
-# nltk.download('punkt_tab')
+nltk.download('punkt')
+nltk.download('stopwords')
 
 class Index:
     
-    def __init__(self):
+    def __init__(self, load=False):
         
         # index 
         self.index = defaultdict(lambda: defaultdict(list)) # {word: {doc_id: frequency}}
@@ -23,10 +25,20 @@ class Index:
     
         # TODO: add limit ? 
         # TODO: add method for loading index and mapper from file 
+        if load:
+            self._load()
+            
+    
          
     def tokenize(self, text):
         """ Tokenize text """
-        return nltk.word_tokenize(text)
+        for token in nltk.word_tokenize(text):
+            if token in nltk.corpus.stopwords.words('english'):
+                continue
+            if token in string.punctuation:
+                continue
+            yield token.lower()
+ 
     
     def add(self, url, content):
         """ Add to index """
@@ -74,3 +86,11 @@ class Index:
     def _get_document_id(self, url):
         """ Get the document id for the given url """
         return [k for k, v in self.mapper.items() if v == url][0]
+    
+    def _load(self):
+        """ Load the index and mapper from file """
+        with open(self.index_path, 'r') as index_file:
+            self.index = json.load(index_file)
+
+        with open(self.mapper_path, 'r') as mapper_file:
+            self.mapper = json.load(mapper_file)
