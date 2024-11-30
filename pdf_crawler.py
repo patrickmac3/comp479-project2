@@ -2,7 +2,7 @@ import io
 import PyPDF2
 import scrapy 
 import threading 
-
+import re 
 
 class PdfCrawler(scrapy.Spider):
     name = 'pdf_crawler'
@@ -54,7 +54,20 @@ class PdfCrawler(scrapy.Spider):
             year_links = response.css(div_selector).getall()
             for year_link in year_links:
                 if year_link and year_link.endswith('.html'):
-                    yield response.follow(year_link, callback=self.parse_thesis_list_page)
+                    
+                    
+                    """ 
+                        Assuming the year link (href) has the following format -> 2010.html 
+                        And that more recent years are more likely to have readable pdfs, 
+                        we use the year to set the priority of the request
+                    """
+                    match = re.search(r'(\d{4})\.html$', year_link)
+                    if match:
+                        year = int(match.group(1))
+                        priority = -year 
+                        self.logger.info(f"Enqueueing {year_link} with priority {priority}")
+                        yield response.follow(year_link, callback=self.parse_thesis_list_page, priority=priority)
+             
     
     def parse_thesis_list_page(self, response):
         """ From the thesis list page, extract the link for individual thesis pages """
@@ -71,24 +84,29 @@ class PdfCrawler(scrapy.Spider):
         if pdf:
             yield response.follow(pdf, callback=self.parse_pdf) 
             
+    
     def parse_pdf(self, response):
-        """ Extract the text from the thesis (pdf) """
-        if self.counter >= self.limit: 
-            self.crawler.engine.close_spider(self, "PDF limit reached")
-            return
+        """ Parse the pdf content """
+        with self.counter_lock:
+            if self.counter >= self.limit:
+                self.crawler.engine.close_spider(self, "PDF limit reached")
+                return
+            self.counter += 1
+            
         pdf_stream = io.BytesIO(response.body)
+        
         try:
             reader = PyPDF2.PdfReader(pdf_stream)
             if not reader.pages:
-                return
-        except Exception as e:
-            return
-        for page in reader.pages:
-            if not (content:= page.extract_text()).strip():
                 return 
-            yield {
-                'url': response.url,
-                'content': content
-            }
-        self.counter += 1
+        except Exception as e:
+            self.logger.error(f"Error reading pdf: {response.url}")
+            return 
         
+        for page in reader.pages:
+            if not (content:=page.extract_text()).strip():
+                continue 
+            yield {
+                "url": response.url,
+                "content": content
+            }
