@@ -4,8 +4,15 @@ from pipeline import Pipeline
 
 
 def main():
+    
+    # initialize the pipeline 
     pipeline = Pipeline()
-    pipeline.start(PdfCrawler)
+    
+    # start the pipeline with the pdf crawler and a limit of  pdfs
+    limit = 100
+    pipeline.start(PdfCrawler, limit)
+    
+    # save the index after the pipeline is done
     pipeline.index.save()
 
 
