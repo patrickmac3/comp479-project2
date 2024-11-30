@@ -7,18 +7,19 @@ from scrapy import signals
 class Pipeline:
     
     def __init__(self):
-        
         self.index = Index()
         self.settings = get_project_settings()
-        self.settings.set('ROBOTSTXT_OBEY', True)
+        self.settings.set('ROBOTSTXT_OBEY', True) # obey robots.txt rules
         self.process = CrawlerProcess(settings=self.settings)
         
         
-    def start(self, spider):
-        dispatcher.connect(self._process_item, signal=signals.item_scraped)
-        self.process.crawl(spider)
+    def start(self, spider, limit=5):
+        """ Execute the crawler """
+        dispatcher.connect(self._process_item, signal=signals.item_scraped) # use _process_item to process data from the spider
+        self.process.crawl(crawler_or_spidercls=spider, limit=limit)
         self.process.start()
         
     
     def _process_item(self, item, spider):
-        self.index.add(item['url'], item['content'])
+        """ Process the item from the crawler """
+        self.index.add(item['url'], item['content']) # add the content to the index
