@@ -9,7 +9,7 @@ def main():
     pipeline = Pipeline()
     
     # start the pipeline with the pdf crawler and a limit of  pdfs
-    limit = 100
+    limit = 400
     pipeline.start(PdfCrawler, limit)
     
     # save the index after the pipeline is done

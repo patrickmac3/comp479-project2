@@ -2,9 +2,14 @@ from collections import defaultdict
 import nltk 
 import json
 import string 
+import nltk
+import string
+import re
+from nltk.corpus import stopwords
+from nltk.stem import PorterStemmer
+from nltk.tokenize import word_tokenize
+from unidecode import unidecode
 
-nltk.download('punkt')
-nltk.download('stopwords')
 
 class Index:
     
@@ -23,22 +28,41 @@ class Index:
         self.previous_id = None
         self.previous_url = None
     
-        # TODO: add limit ? 
-        # TODO: add method for loading index and mapper from file 
         if load:
             self._load()
             
+        # Download necessary NLTK resources
+        nltk.download('punkt')
+        nltk.download('stopwords')
     
-         
+        # for tokenization 
+        self.stop_words = set(stopwords.words('english')).union(set(stopwords.words('french')))
+        self.stemmer = PorterStemmer()
+
+
+
     def tokenize(self, text):
-        """ Tokenize text """
-        for token in nltk.word_tokenize(text):
-            if token in nltk.corpus.stopwords.words('english'):
-                continue
-            if token in string.punctuation:
-                continue
-            yield token.lower()
- 
+        """ Tokenize text with improvements """
+
+        # Lowercase and remove accents
+        text = text.lower()
+        text = unidecode(text)
+
+        # Remove special characters
+        text = re.sub(r'[\n\t]', '', text) # remove new lines and tabs
+        text = re.sub(rf"[{re.escape(string.punctuation)}]", '', text)  # Remove punctuation
+
+        # Tokenize and remove stop words
+        for token in word_tokenize(text):
+
+            # Remove non-alphabetic characters
+            token = ''.join(c for c in token if c.isalpha())
+
+            # Stem and remove stop words
+            if token and token not in self.stop_words:
+                yield self.stemmer.stem(token)
+
+    
     
     def add(self, url, content):
         """ Add to index """

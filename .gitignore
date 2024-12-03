@@ -1,7 +1,17 @@
+# virtual environment
+venv/
+
+# IDE files
 __pycache__/
+
+# index storage directories 
+index/
 index_main/
 index_faculty/
-venv/
-readme.md
-# temporary 
+
+# clustering files 
+clustering/
+
+# temporarily in .gitignore. Will be removed after finished  
 clustering.py
+readme.md
