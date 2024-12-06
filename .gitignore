@@ -5,9 +5,6 @@ venv/
 __pycache__/
 
 # index storage directories 
-index/
-index_main/
-index_faculty/
-trash/
-# temporarily in .gitignore. Will be removed after finished  
-readme.md
+
+
+
