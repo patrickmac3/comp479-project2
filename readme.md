@@ -69,6 +69,18 @@ The default values for each parameter are:
 - `k`: 7
 - `top`: 20
 
+## Note
+if you run the project and get an error like the following: 
+```bash 
+Traceback (most recent call last):
+  File "/home/patrick/comp479/p2/main.py", line 18, in <module>
+    cluster(args.k, args.top, index_path="index/mapper.json", mapper_path="index/mapper.json")
+  File "/home/patrick/comp479/p2/clustering.py", line 24, in cluster
+    raise ValueError("All tokens were filtered out. Adjust the threshold.")
+ValueError: All tokens were filtered out. Adjust the threshold.
+```
+Ajdust the threshold from 75 % at line 19 of `clustering.py`
+
 
 # Project Demo
 
