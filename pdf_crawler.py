@@ -110,3 +110,5 @@ class PdfCrawler(scrapy.Spider):
                 "url": response.url,
                 "content": content
             }
+
+        

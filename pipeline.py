@@ -7,9 +7,14 @@ from scrapy import signals
 class Pipeline:
     
     def __init__(self):
+        # inverted index to store the content 
         self.index = Index()
+
+        # get the settings for the crawler
         self.settings = get_project_settings()
         self.settings.set('ROBOTSTXT_OBEY', True) # obey robots.txt rules
+
+        # initialize the crawler process
         self.process = CrawlerProcess(settings=self.settings)
         
         

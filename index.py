@@ -9,12 +9,11 @@ from nltk.corpus import stopwords
 from nltk.stem import PorterStemmer
 from nltk.tokenize import word_tokenize
 from unidecode import unidecode
-
+import os 
 
 class Index:
     
-    def __init__(self, load=False):
-        
+    def __init__(self, load=False, index_path="index/index.json", mapper_path="index/mapper.json" ):
         # index 
         self.index = defaultdict(lambda: defaultdict(list)) # {word: {doc_id: frequency}}
         # document id mapper 
@@ -22,15 +21,20 @@ class Index:
         # counter to generate the unique document id 
         self.counter = 0
         # file path to save index and mapper 
-        self.index_path = "index_main/index.json"
-        self.mapper_path = "index_main/mapper.json"   
+        self.index_path = index_path
+        self.mapper_path = mapper_path   
+
+        # Check if index_path and mapper_path exist, if they don't create them
+        os.makedirs(os.path.dirname(self.index_path), exist_ok=True)
+        os.makedirs(os.path.dirname(self.mapper_path), exist_ok=True)
+        
         # Quick way of getting id for url since it is beeing passed page by page 
         self.previous_id = None
         self.previous_url = None
     
-        if load:
+        # Load index and mapper if they exist
+        if load: 
             self._load()
-            
         # Download necessary NLTK resources
         nltk.download('punkt')
         nltk.download('stopwords')
@@ -38,8 +42,7 @@ class Index:
         # for tokenization 
         self.stop_words = set(stopwords.words('english')).union(set(stopwords.words('french')))
         self.stemmer = PorterStemmer()
-
-
+        
 
     def tokenize(self, text):
         """ Tokenize text with improvements """
@@ -85,8 +88,9 @@ class Index:
 
         with open(self.mapper_path, 'w') as mapper_file:
             json.dump(self.mapper, mapper_file)
-    """ Private Methods  """
     
+    
+    """ Private Methods  """
     
     def _get_id(self, url):
         """ Get a document id for a given url  """
