@@ -82,9 +82,9 @@ def cluster(number_of_clusters=7, n_terms=50, index_path="index_main/index.json"
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--k", type=int, default=400, help="Number of clusters")
+    parser.add_argument("--k", type=int, default=7, help="Number of clusters")
     parser.add_argument("--top", type=int, default=20, help="Number of top terms per cluster")
-    parser.add_argument("--index", type=str, default="index_main/index.json", help="Index file path (json)")
-    parser.add_argument("--mapper", type=str, default="index_main/mapper.json", help="Mapper file path (json)")
+    # parser.add_argument("--index", type=str, default="index_main/index.json", help="Index file path (json)")
+    # parser.add_argument("--mapper", type=str, default="index_main/mapper.json", help="Mapper file path (json)")
     args = parser.parse_args()
-    cluster(args.k, args.top, index_path=args.index, mapper_path=args.mapper)
+    cluster(args.k, args.top)
